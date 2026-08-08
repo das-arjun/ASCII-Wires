@@ -1,2 +1,2 @@
 # ASCII-Wires
-![Typing Animation](typing.svg)
+![Typing Animation](img/typing.svg)
