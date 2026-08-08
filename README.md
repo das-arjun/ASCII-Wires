@@ -149,10 +149,10 @@ NodeMCU / D1 Mini (ESP8266)\
 Raspberry Pi Pico / Pico 2 (RP2040 / RP2350)\
 You must pass your custom SDA and SCL pins directly into the Wire.begin() function inside setup(). For example, on a standard ESP32:\
 void setup() {\
-  pinMode(signalPin, INPUT);\
+  pinMode(signalPin, INPUT);
   
   // Explicitly assign I2C pins (e.g., SDA = 21, SCL = 22 for ESP32)\
-  Wire.begin(21, 22); \
+  Wire.begin(21, 22); 
 
   lcd.init();\
   lcd.backlight();\
@@ -162,7 +162,7 @@ Arduino Uno R4 Minima / WiFi (Renesas RA4M1 architecture)\
 Arduino Zero / Nano 33 IoT (SAMD21 ARM Cortex-M0+ architecture)\
 Adafruit Metro M0 / M4 Express (ARM Cortex architecture)\
 Teensy 4.0 / 4.1 (ARM Cortex-M7 architecture)\
-// Replace old AVR register code with native 32-bit hardware timers:
+// Replace old AVR register code with native 32-bit hardware timers:\
 __#include <TimerInterrupt.h> // Example for 32-bit boards__
 ##Pinout
 Pin D2 to P0
