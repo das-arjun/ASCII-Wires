@@ -119,7 +119,51 @@ Possible extensions include:
 * Custom communication protocol
 * Data transmission testing and error-rate measurement
 * Visualizing transmitted bits using LEDs or a logic analyzer
+## Requirements and pinout
+micro:bit v2+
+I2C LCD (MCP23008, 0x27, 16 by 2 display)
+Alligator clips
+Arduino Uno R3 (or R4 Minima/Minima WiFi/ WiFi Rev2), though it also works on the following:
+Arduino Nano V3\
+Arduino Pro Mini (5V / 16MHz)\
+Arduino Uno Mini Limited Edition\
+SparkFun RedBoard\
+SparkFun RedBoard Edge\
+Adafruit Metro 328
+DFRobot DFRduino Uno R3\
+Seeeduino V4.2\
+All generic or third-party Clone Uno R3 boards (Elegoo, Inland, etc.)
+###With change of pins
+Arduino Mega 2560 / Mega ADK (Move LCD to pins 20 and 21)\
+Arduino Nano Every (Move LCD to pins A4 and A5)\
+Arduino Micro (Move LCD to pins 2 and 3; change signal pin to avoid conflict)\
+LilyPad Arduino Main Board (Move LCD to pins A4 and A5)
+###With code change
+Arduino Leonardo\
+Arduino MicroPro Micro (5V or 3.3V)\
+Required Code Modification:\
+You must change your input pin variable from Pin 2 to any available digital pin (like Pin 4 or Pin 7).\
+__const int signalPin = 4; // Moved from 2 to avoid I2C conflict__\
+ESP32 Development Boards (ESP32-WROOM, ESP32-S3)\
+NodeMCU / D1 Mini (ESP8266)\
+Raspberry Pi Pico / Pico 2 (RP2040 / RP2350)\
+You must pass your custom SDA and SCL pins directly into the Wire.begin() function inside setup(). For example, on a standard ESP32:\
+void setup() {\
+  pinMode(signalPin, INPUT);\
+  
+  // Explicitly assign I2C pins (e.g., SDA = 21, SCL = 22 for ESP32)\
+  Wire.begin(21, 22); \
 
-## 📄 License
+  lcd.init();\
+  lcd.backlight();\
+  // ... rest of setup\
+}
+Arduino Uno R4 Minima / WiFi (Renesas RA4M1 architecture)\
+Arduino Zero / Nano 33 IoT (SAMD21 ARM Cortex-M0+ architecture)\
+Adafruit Metro M0 / M4 Express (ARM Cortex architecture)\
+Teensy 4.0 / 4.1 (ARM Cortex-M7 architecture)\
+// Replace old AVR register code with native 32-bit hardware timers:
+__#include <TimerInterrupt.h> // Example for 32-bit boards__
+## 📄 License Apache 2.0
 
 This project is intended for educational and experimental purposes.
