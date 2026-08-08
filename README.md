@@ -1,2 +1,125 @@
 # ASCII-Wires
-![Typing Animation](img/typing.svg)
+## Bit Transfer Between Arduino Uno R3 and micro:bit V2
+
+A simple embedded-systems project that demonstrates **transferring digital bits between two different microcontrollers** using physical wires: an **Arduino Uno R3** and a **BBC micro:bit V2**.
+
+## 📌 Project Overview
+
+This project explores how two microcontrollers can communicate at the bit level without relying on higher-level communication protocols such as UART, I²C, or SPI.
+
+The Arduino Uno R3 and micro:bit V2 exchange binary data through GPIO pins connected with wires. Individual bits are represented using digital **HIGH** and **LOW** signals, allowing one microcontroller to transmit a sequence of bits while the other receives and reconstructs the data.
+
+The project is intended as a hands-on demonstration of:
+
+* Digital signals and binary data
+* GPIO input and output
+* Bit-level communication
+* Timing and synchronization
+* Serial data transmission
+* Communication between different microcontroller platforms
+
+## 🔧 Hardware
+
+* Arduino Uno R3
+* BBC micro:bit V2
+* Jumper wires
+* Breadboard (optional)
+* USB cables for programming and power
+
+## ⚙️ How It Works
+
+The transmitter converts data into a sequence of binary bits. Each bit is represented by the voltage level on a GPIO wire:
+
+* **HIGH** → `1`
+* **LOW** → `0`
+
+The receiving microcontroller samples the signal at the appropriate time and stores the received bits. After enough bits have been collected, they can be combined to reconstruct the original byte or message.
+
+For example:
+
+```text
+Data:       10110010
+
+Bit stream:
+1 → 0 → 1 → 1 → 0 → 0 → 1 → 0
+```
+
+The project therefore demonstrates the fundamental idea behind digital communication: **information can be represented and transferred using changes in electrical signals.**
+
+## 🔌 Connection
+
+A GPIO pin on the Arduino is connected to a GPIO pin on the micro:bit.
+
+A **common GND connection is required** so that both microcontrollers share the same voltage reference.
+
+> ⚠️ Always verify the voltage levels and pin configuration before connecting the boards. The micro:bit uses 3.3 V GPIO logic, while the Arduino Uno R3 uses 5 V logic.
+
+## 🚀 Goals
+
+The main goals of this project are to:
+
+1. Understand how individual bits can be transmitted through a wire.
+2. Learn how microcontrollers generate and read digital signals.
+3. Implement basic synchronization between a transmitter and receiver.
+4. Transfer bytes or messages between an Arduino and micro:bit.
+5. Explore the principles behind more advanced digital communication protocols.
+
+## 📂 Project Structure
+
+```text
+├── arduino/
+│   └── transmitter.ino
+│
+├── microbit/
+│   └── receiver.py
+│
+└── README.md
+```
+
+The exact structure may vary depending on the programming environment used for the micro:bit.
+
+## 🧪 Example
+
+If the Arduino wants to transmit the byte:
+
+```text
+01001000
+```
+
+it sends each bit sequentially through the GPIO connection. The micro:bit reads the signal, records the bits, and reconstructs:
+
+```text
+01001000
+```
+
+which corresponds to the ASCII character:
+
+```text
+H
+```
+
+## 📚 What This Project Demonstrates
+
+This project provides a practical introduction to the concepts that form the foundation of computer and embedded communication:
+
+**Binary data → Digital signals → Electrical pulses → GPIO → Reconstructed data**
+
+Although the implementation is intentionally simple, the same fundamental concepts are used in communication systems ranging from simple serial links to complex networking hardware.
+
+## 🔮 Future Improvements
+
+Possible extensions include:
+
+* Two-way communication
+* Start and stop bits
+* Clock/synchronization signal
+* Checksum or parity for error detection
+* Multi-byte messages
+* Bidirectional communication
+* Custom communication protocol
+* Data transmission testing and error-rate measurement
+* Visualizing transmitted bits using LEDs or a logic analyzer
+
+## 📄 License
+
+This project is intended for educational and experimental purposes.
