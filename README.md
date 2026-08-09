@@ -1,5 +1,5 @@
 
-# ASCII-Wires % Woah, you found me!
+# ASCII-Wires
 ## Bit Transfer Between Arduino Uno R3 and micro:bit V2
 
 A simple embedded-systems project that demonstrates **transferring digital bits between two different microcontrollers** using physical wires: an **Arduino Uno R3** and a **BBC micro:bit V2**.
@@ -120,7 +120,7 @@ Possible extensions include:
 * Custom communication protocol
 * Data transmission testing and error-rate measurement
 * Visualizing transmitted bits using LEDs or a logic analyzer
-# Requirements and pinout
+## Requirements and pinout
 micro:bit v2+
 I2C LCD (MCP23008, 0x27, 16 by 2 display)
 Alligator clips
@@ -134,12 +134,12 @@ Adafruit Metro 328
 DFRobot DFRduino Uno R3\
 Seeeduino V4.2\
 All generic or third-party Clone Uno R3 boards (Elegoo, Inland, etc.)
-##With change of pins
+### With change of pins
 Arduino Mega 2560 / Mega ADK (Move LCD to pins 20 and 21)\
 Arduino Nano Every (Move LCD to pins A4 and A5)\
 Arduino Micro (Move LCD to pins 2 and 3; change signal pin to avoid conflict)\
 LilyPad Arduino Main Board (Move LCD to pins A4 and A5)
-##With code change
+### With code change
 Arduino Leonardo\
 Arduino MicroPro Micro (5V or 3.3V)\
 Required Code Modification:\
@@ -165,15 +165,17 @@ Adafruit Metro M0 / M4 Express (ARM Cortex architecture)\
 Teensy 4.0 / 4.1 (ARM Cortex-M7 architecture)\
 // Replace old AVR register code with native 32-bit hardware timers:\
 __#include <TimerInterrupt.h> // Example for 32-bit boards__
-## Pinout
+### Pinout
 Pin D2 arduino --- P0 micro:bit
 SDA and SCL --- (ditto on the MCP-based I²C LCD)
-## 📄 License Apache 2.0
+## 📄 Notes
 
 This project is intended for educational and experimental purposes.\
-I have no grudges or copyright for ASCII, Arduino, nor microbit and solemnly agree to all rules and regulations.
-This repo was made for fun, by an 11 yr old. No beef with the ESP-32 storyteller \href{https://example.com}{ESP-32 storyteller}; although this is the first part of a big project.
-Step 1: Send binary ASCII through wires. (Done)
-Step 2: Make a LM (Either LLM or SLM)
-Step 3: Figure out how to get that info to the micro:bit
-Step 4: We have a Poem Generator!
+I have no grudges or copyright for ASCII, Arduino, nor microbit and solemnly agree to all rules and regulations.\
+This repo was made for fun, by an 11 yr old. No beef with the [ESP-32 storyteller](https://github.com/slvDev/esp32-ai); although this is the first part of a big project.\
+Step 1: Send binary ASCII through wires. (Done)\
+Step 2: Make a LM (Either LLM or SLM)\
+Step 3: Figure out how to get that info to the micro:bit.\
+Step 4: We have a Poem Generator!\
+I specifically made this with a microcontroller with ATMega32p stats and a basic C++ interface, Arduino Uno R3; and a basic SLM handler, micro:bit, which can use SLMs to do basic stuff, and is programmable with JS, Python, Scratch and its lookalikes whether in the Gandi family or not; because I think it would honestly be more impressive if I did it that way, than to use complex microcontroller/Linux PC beasts, like the Raspberry Pi 5/ AI HAT+ /AI HAT+ 2 or an ESP-32 based controller like the Arduino Mini/Nano. But that is for you, dear viewer, to think about and decide.
+You are allowed to fork it.
