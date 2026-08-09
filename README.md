@@ -166,7 +166,7 @@ Teensy 4.0 / 4.1 (ARM Cortex-M7 architecture)\
 __#include <TimerInterrupt.h> // Example for 32-bit boards__
 ## Pinout
 Pin D2 arduino --- P0 micro:bit
-SDA and SCL --- (ditto on the I$^2$C LCD (MCP based) )
+SDA and SCL --- (ditto on the $I^2$C LCD (MCP based) )
 ## 📄 License Apache 2.0
 
 This project is intended for educational and experimental purposes.
