@@ -119,7 +119,7 @@ Possible extensions include:
 * Custom communication protocol
 * Data transmission testing and error-rate measurement
 * Visualizing transmitted bits using LEDs or a logic analyzer
-## Requirements and pinout
+# Requirements and pinout
 micro:bit v2+
 I2C LCD (MCP23008, 0x27, 16 by 2 display)
 Alligator clips
@@ -133,12 +133,12 @@ Adafruit Metro 328
 DFRobot DFRduino Uno R3\
 Seeeduino V4.2\
 All generic or third-party Clone Uno R3 boards (Elegoo, Inland, etc.)
-###With change of pins
+##With change of pins
 Arduino Mega 2560 / Mega ADK (Move LCD to pins 20 and 21)\
 Arduino Nano Every (Move LCD to pins A4 and A5)\
 Arduino Micro (Move LCD to pins 2 and 3; change signal pin to avoid conflict)\
 LilyPad Arduino Main Board (Move LCD to pins A4 and A5)
-###With code change
+##With code change
 Arduino Leonardo\
 Arduino MicroPro Micro (5V or 3.3V)\
 Required Code Modification:\
