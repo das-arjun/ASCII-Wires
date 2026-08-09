@@ -164,9 +164,9 @@ Adafruit Metro M0 / M4 Express (ARM Cortex architecture)\
 Teensy 4.0 / 4.1 (ARM Cortex-M7 architecture)\
 // Replace old AVR register code with native 32-bit hardware timers:\
 __#include <TimerInterrupt.h> // Example for 32-bit boards__
-##Pinout
-Pin D2 to P0
-(also there is i2c pinout but u figure it out.)
+## Pinout
+Pin D2 arduino --- P0 micro:bit
+SDA and SCL --- (ditto on the I$^2$C LCD (MCP based) )
 ## 📄 License Apache 2.0
 
 This project is intended for educational and experimental purposes.
