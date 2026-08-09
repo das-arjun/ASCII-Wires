@@ -1,4 +1,5 @@
-# ASCII-Wires
+
+# ASCII-Wires % Woah, you found me!
 ## Bit Transfer Between Arduino Uno R3 and micro:bit V2
 
 A simple embedded-systems project that demonstrates **transferring digital bits between two different microcontrollers** using physical wires: an **Arduino Uno R3** and a **BBC micro:bit V2**.
@@ -166,7 +167,13 @@ Teensy 4.0 / 4.1 (ARM Cortex-M7 architecture)\
 __#include <TimerInterrupt.h> // Example for 32-bit boards__
 ## Pinout
 Pin D2 arduino --- P0 micro:bit
-SDA and SCL --- (ditto on the I2C LCD (MCP based) )
+SDA and SCL --- (ditto on the MCP-based I²C LCD)
 ## 📄 License Apache 2.0
 
-This project is intended for educational and experimental purposes.
+This project is intended for educational and experimental purposes.\
+I have no grudges or copyright for ASCII, Arduino, nor microbit and solemnly agree to all rules and regulations.
+This repo was made for fun, by an 11 yr old. No beef with the ESP-32 storyteller \href{https://example.com}{ESP-32 storyteller}; although this is the first part of a big project.
+Step 1: Send binary ASCII through wires. (Done)
+Step 2: Make a LM (Either LLM or SLM)
+Step 3: Figure out how to get that info to the micro:bit
+Step 4: We have a Poem Generator!
