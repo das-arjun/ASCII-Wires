@@ -19,14 +19,6 @@ The project is intended as a hands-on demonstration of:
 * Serial data transmission
 * Communication between different microcontroller platforms
 
-## 🔧 Hardware
-
-* Arduino Uno R3
-* BBC micro:bit V2
-* Jumper wires
-* Breadboard (optional)
-* USB cables for programming and power
-
 ## ⚙️ How It Works
 
 The transmitter converts data into a sequence of binary bits. Each bit is represented by the voltage level on a GPIO wire:
@@ -121,7 +113,7 @@ Possible extensions include:
 * Data transmission testing and error-rate measurement
 * Visualizing transmitted bits using LEDs or a logic analyzer
 ## Requirements and pinout
-micro:bit v2+\
+micro:bit v1+\
 I2C LCD (MCP23008, 0x27, 16 by 2 display)\
 Alligator clips\
 Arduino Uno R3 (or R4 Minima/Minima WiFi/ WiFi Rev2), though it also works on the following:\
