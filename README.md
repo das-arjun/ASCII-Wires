@@ -183,7 +183,7 @@ This project is intended for educational and experimental purposes.\
 I have no grudges or copyright for ASCII, Arduino, nor microbit and solemnly agree to all rules and regulations.\
 This repo was made for fun, by an 11 yr old. No beef with the [ESP-32 storyteller](https://github.com/slvDev/esp32-ai); although this is the first part of a big project.\
 Step 1: Send binary ASCII through wires. (Done)\
-Step 2: Make a LM (Either LLM or SLM)\
+Step 2: Make a LM (Either LLM or SLM) (Done, it wasn't even a LM!)\
 Step 3: Figure out how to get that info to the micro:bit.\
 Step 4: We have a Poem Generator!\
 I specifically made this with a microcontroller with ATMega32p stats and a basic C++ interface, Arduino Uno R3; and a basic SLM handler, micro:bit, which can use SLMs to do basic stuff, and is programmable with JS, Python, Scratch and its lookalikes whether in the Gandi family or not; because I think it would honestly be more impressive if I did it that way, than to use complex microcontroller/Linux PC beasts, like the Raspberry Pi 5/ AI HAT+ /AI HAT+ 2 or an ESP-32 based controller like the Arduino Mini/Nano. But that is for you, dear viewer, to think about and decide.\
