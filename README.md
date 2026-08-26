@@ -1,183 +1,247 @@
+# ASCII-Wires: The Direct-Stream Poem Project
+## Bit-Paced Serial Transfer & Direct GPIO Inter-Device Signaling
 
-# ASCII-Wires
-## Bit Transfer Between Arduino Uno R3 and micro:bit V2
-
-A simple embedded-systems project that demonstrates **transferring digital bits between two different microcontrollers** using physical wires: an **Arduino Uno R3** and a **BBC micro:bit V2**.
+A hands-on embedded-systems project that demonstrates **direct serial data ingest and hardware signaling between microcontrollers** using a Mac (PyCharm), an **Arduino Uno R3**, and a **BBC micro:bit V1/V2**.
 
 ## 📌 Project Overview
 
-This project explores how two microcontrollers can communicate at the bit level without relying on higher-level communication protocols such as UART, I²C, or SPI.
+This project explores how a computer script can stream dynamically generated data into an entry-level microcontroller over standard serial protocols, and use hardware-level digital state changes to trigger multi-screen status indicators across platform families.
 
-The Arduino Uno R3 and micro:bit V2 exchange binary data through GPIO pins connected with wires. Individual bits are represented using digital **HIGH** and **LOW** signals, allowing one microcontroller to transmit a sequence of bits while the other receives and reconstructs the data.
+The system loops through four distinct stages:
+1. **PyCharm (Mac):** Generates a grammatically aligned random poem and streams it character-by-character over a direct USB line.
+2. **Arduino Uno R3 (The Core Receiver):** Collects the text into an isolation software ring buffer to completely bypass the 64-byte hardware limit, typing it out at a readable human pace on an I2C LCD screen.
+3. **The Stop Marker (`#`):** Signals to the Arduino that transmission is complete.
+4. **The micro:bit (Status Node):** Monitors a direct digital input pin from the Arduino. When the pin transitions to `HIGH`, the micro:bit swaps its waiting display to a giant checkmark (**Tick**).
 
-The project is intended as a hands-on demonstration of:
-
-* Digital signals and binary data
-* GPIO input and output
-* Bit-level communication
-* Timing and synchronization
-* Serial data transmission
-* Communication between different microcontroller platforms
+The project is a practical demonstration of:
+* Software-driven hardware buffer overflow management
+* Multi-platform logic levels and shared ground references
+* Continuous background loop sampling inside MakeCode JavaScript (JS)
+* Grammatically constrained lexical matrix generators
 
 ## ⚙️ How It Works
 
-The transmitter converts data into a sequence of binary bits. Each bit is represented by the voltage level on a GPIO wire:
-
-* **HIGH** → `1`
-* **LOW** → `0`
-
-The receiving microcontroller samples the signal at the appropriate time and stores the received bits. After enough bits have been collected, they can be combined to reconstruct the original byte or message.
-
-For example:
-
 ```text
-Data:       10110010
++-----------------------+              +-----------------------+              +-------------------+
 
-Bit stream:
-1 → 0 → 1 → 1 → 0 → 0 → 1 → 0
+|     Mac Laptop        |  USB Serial  |   Arduino Uno R3      |  Digital Pin |   BBC micro:bit   |
+|   (PyCharm Python)    | ------------>| (Paced Typing Engine) | ------------>|    (Pin P0 Input) |
+|  [Poem Generator Code]|  (9600 Baud) |  [Prints to I2C LCD]  |  (HIGH Signal)   | [Displays a Tick] |
++-----------------------+              +-----------------------+              +-------------------+
 ```
 
-The project therefore demonstrates the fundamental idea behind digital communication: **information can be represented and transferred using changes in electrical signals.**
+### 1. Pacing the Pipeline
+Because the Arduino's hardware interface caps input arrays at **64 bytes**, the Python script paces its output stream by injecting a **25ms delay** between characters. This keeps the incoming buffer cleared while printing.
 
-## 🔌 Connection
+### 2. Typing Engine
+The Arduino continuously sweeps characters out of the serial cache and feeds them into a 256-byte circular array. It applies a non-blocking `millis()` tracking window to step through the array indices every **150ms**, producing a sleek "typing" animation on the LCD without blocking the chip.
 
-A GPIO pin on the Arduino is connected to a GPIO pin on the micro:bit.
+## 🔌 Hardware Connection & Pinout
 
-A **common GND connection is required** so that both microcontrollers share the same voltage reference.
+```text
+[Arduino Uno R3]                            [BBC micro:bit]
+      5V  ------------------------------->    VCC / 3V Pad
+     GND  ------------------------------->    GND Pad
+  Pin D3  ------------------------------->    Pin P0 Pad
 
-> ⚠️ Always verify the voltage levels and pin configuration before connecting the boards. The micro:bit uses 3.3 V GPIO logic, while the Arduino Uno R3 uses 5 V logic.
+[Arduino Uno R3]                            [I2C LCD Display]
+  Pin A4 (SDA) -------------------------->    SDA
+  Pin A5 (SCL) -------------------------->    SCL
+```
 
-## 🚀 Goals
-
-The main goals of this project are to:
-
-1. Understand how individual bits can be transmitted through a wire.
-2. Learn how microcontrollers generate and read digital signals.
-3. Implement basic synchronization between a transmitter and receiver.
-4. Transfer bytes or messages between an Arduino and micro:bit.
-5. Explore the principles behind more advanced digital communication protocols.
+> ⚠️ **Important Wiring Note:** Connecting a common ground (`GND`) wire between all active platforms is absolutely mandatory to prevent floating logic states and noise disruption. 
 
 ## 📂 Project Structure
 
 ```text
 ├── arduino/
-│   └── transmitter.ino
+│   └── lcd_receiver.ino     # Non-blocking ring buffer typing engine
 │
 ├── microbit/
-│   └── receiver.py
+│   └── tick_display.js      # MakeCode JavaScript pin monitoring script
+│
+├── python/
+│   └── poem_sender.py       # Paced character stream generator
 │
 └── README.md
 ```
 
-The exact structure may vary depending on the programming environment used for the micro:bit.
+## 💻 Source Code
 
-## 🧪 Example
+### 1. Python Sender Script (`python/poem_sender.py`)
+Run this script locally on your machine inside **PyCharm**.
 
-If the Arduino wants to transmit the byte:
+```python
+import random
+import time
+import serial
 
-```text
-01001000
+def generate_perfect_poem(subject="nature"):
+    adjectives_vowel = ["ancient", "enchanted", "infinite", "emerald", "unfading"]
+    adjectives_consonant = ["shimmering", "whispering", "golden", "serene", "mystic", "gentle", "bright", "silent", "velvet"]
+    singular_nouns = ["leaf", "star", "river", "mountain", "dream", "wind", "flower", "shadow", "spirit", "echo", "heart", "melody"]
+    plural_nouns = ["leaves", "stars", "rivers", "mountains", "dreams", "winds", "flowers", "shadows", "echoes", "melodies"]
+    verbs_plural_noun = ["dance", "sing", "dream", "flow", "rise", "whisper", "glow", "sleep", "awaken", "bloom"]
+    verbs_active = ["takes flight", "drifts away", "unfurls", "soars high", "watches close"]
+
+    adj1 = random.choice(adjectives_vowel + adjectives_consonant)
+    line1 = f"Oh {adj1} {subject.lower()} so grand,"
+
+    p_noun = random.choice(plural_nouns)
+    p_verb = random.choice(verbs_plural_noun)
+    line2 = f"Where {p_noun} {p_verb} in the breeze,"
+
+    adj2_vowel = random.choice(adjectives_vowel)
+    adj2_consonant = random.choice(adjectives_consonant)
+    s_noun = random.choice(singular_nouns)
+    v_active = random.choice(verbs_active)
+    
+    if random.choice([True, False]):
+        line3 = f"An {adj2_vowel} {s_noun} {v_active},"
+    else:
+        line3 = f"A {adj2_consonant} {s_noun} {v_active},"
+
+    p_noun2 = random.choice(plural_nouns)
+    line4 = f"Secrets that the {p_noun2} keep."
+
+    return f"{line1} {line2} {line3} {line4}"
+
+SERIAL_PORT = '/dev/cu.usbmodem14201'  # Mac port assignment
+BAUD_RATE = 9600      
+
+try:
+    poem_output = generate_perfect_poem("ocean")
+    print(f"Generated text:\n{poem_output}\n")
+    
+    ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
+    time.sleep(2) # Give the bootloader time to pass control
+    
+    payload = poem_output.strip() + "#"
+    print("Pacing transmission over USB link to prevent buffer overflow...")
+    
+    for char in payload:
+        ser.write(char.encode('utf-8'))
+        ser.flush()
+        time.sleep(0.025) # 25ms delay
+        
+    ser.close()
+    print("Sent successfully!")
+except Exception as e:
+    print(f"Error: {e}")
 ```
 
-it sends each bit sequentially through the GPIO connection. The micro:bit reads the signal, records the bits, and reconstructs:
+### 2. Arduino Core Engine (`arduino/lcd_receiver.ino`)
+Upload this code to your **Arduino Uno R3**.
 
-```text
-01001000
-```
+```cpp
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
 
-which corresponds to the ASCII character:
+const int triggerPin = 3; 
+LiquidCrystal_I2C lcd(0x27, 16, 2);
 
-```text
-H
-```
+char textBuffer[256];
+int writeIndex = 0;
+int readIndex = 0;
 
-## 📚 What This Project Demonstrates
+int lcdColumn = 0;
+int lcdRow = 0;
+bool isPrintingPoem = false;
 
-This project provides a practical introduction to the concepts that form the foundation of computer and embedded communication:
+unsigned long lastPrintTime = 0;
+const unsigned long printInterval = 150; 
 
-**Binary data → Digital signals → Electrical pulses → GPIO → Reconstructed data**
-
-Although the implementation is intentionally simple, the same fundamental concepts are used in communication systems ranging from simple serial links to complex networking hardware.
-
-## 🔮 Future Improvements
-
-Possible extensions include:
-
-* Two-way communication
-* Start and stop bits
-* Clock/synchronization signal
-* Checksum or parity for error detection
-* Multi-byte messages
-* Bidirectional communication
-* Custom communication protocol
-* Data transmission testing and error-rate measurement
-* Visualizing transmitted bits using LEDs or a logic analyzer
-## Requirements and pinout
-micro:bit v1+\
-I2C LCD (MCP23008, 0x27, 16 by 2 display)\
-Alligator clips\
-Arduino Uno R3 (or R4 Minima/Minima WiFi/ WiFi Rev2), though it also works on the following:\
-
-Arduino Nano V3\
-Arduino Pro Mini (5V / 16MHz)\
-Arduino Uno Mini Limited Edition\
-SparkFun RedBoard\
-SparkFun RedBoard Edge\
-Adafruit Metro 328
-DFRobot DFRduino Uno R3\
-Seeeduino V4.2\
-All generic or third-party Clone Uno R3 boards (Elegoo, Inland, etc.)
-### With change of pins
-
-Arduino Mega 2560 / Mega ADK (Move LCD to pins 20 and 21)\
-Arduino Nano Every (Move LCD to pins A4 and A5)\
-Arduino Micro (Move LCD to pins 2 and 3; change signal pin to avoid conflict)\
-LilyPad Arduino Main Board (Move LCD to pins A4 and A5)
-### With code change
-
-Arduino Leonardo\
-Arduino MicroPro Micro (5V or 3.3V)\
-Required Code Modification:\
-You must change your input pin variable from Pin 2 to any available digital pin (like Pin 4 or Pin 7).
-
-```const int signalPin = 4; // Moved from 2 to avoid I2C conflict```
-
-ESP32 Development Boards (ESP32-WROOM, ESP32-S3)\
-NodeMCU / D1 Mini (ESP8266)\
-Raspberry Pi Pico / Pico 2 (RP2040 / RP2350)\
-You must pass your custom SDA and SCL pins directly into the Wire.begin() function inside setup(). For example, on a standard ESP32:
-```
 void setup() {
-  pinMode(signalPin, INPUT);
-  
-  // Explicitly assign I2C pins (e.g., SDA = 21, SCL = 22 for ESP32)
-  Wire.begin(21, 22); 
+  Serial.begin(9600); 
+  pinMode(triggerPin, OUTPUT);
+  digitalWrite(triggerPin, LOW);
 
   lcd.init();
   lcd.backlight();
-  // ... rest of setup
+  lcd.setCursor(0, 0);
+  lcd.print("Waiting...");
+}
+
+void loop() {
+  while (Serial.available() > 0) {
+    char c = Serial.read();
+    textBuffer[writeIndex] = c;
+    writeIndex = (writeIndex + 1) % 256; 
+  }
+
+  if (readIndex != writeIndex) {
+    if (millis() - lastPrintTime >= printInterval) {
+      lastPrintTime = millis(); 
+
+      char nextChar = textBuffer[readIndex];
+      readIndex = (readIndex + 1) % 256; 
+
+      if (!isPrintingPoem) {
+        lcd.clear();
+        lcdColumn = 0;
+        lcdRow = 0;
+        isPrintingPoem = true;
+        digitalWrite(triggerPin, LOW); 
+      }
+
+      if (nextChar == '#') {
+        digitalWrite(triggerPin, HIGH); 
+        isPrintingPoem = false;         
+      } 
+      else if (nextChar >= 32 && nextChar <= 126) {
+        lcd.setCursor(lcdColumn, lcdRow);
+        lcd.print(nextChar);
+        lcdColumn++;
+
+        if (lcdColumn >= 16) {
+          lcdColumn = 0;
+          lcdRow++;
+        }
+
+        if (lcdRow >= 2) {
+          lcd.clear();
+          lcdColumn = 0;
+          lcdRow = 0;
+        }
+      }
+    }
+  }
 }
 ```
-Arduino Uno R4 Minima / WiFi (Renesas RA4M1 architecture)\
-Arduino Zero / Nano 33 IoT (SAMD21 ARM Cortex-M0+ architecture)\
-Adafruit Metro M0 / M4 Express (ARM Cortex architecture)\
-Teensy 4.0 / 4.1 (ARM Cortex-M7 architecture)
-```
-// Replace old AVR register code with native 32-bit hardware timers:
-#include <TimerInterrupt.h> // Example for 32-bit boards
-```
-### Pinout
-Pin D2 arduino --- P0 micro:bit\
-SDA and SCL --- (ditto on the MCP-based I²C LCD)
-## 📄 Notes
 
-This project is intended for educational and experimental purposes.\
-I have no grudges or copyright for ASCII, Arduino, nor microbit and solemnly agree to all rules and regulations.\
-This repo was made for fun, by an 11 yr old. No beef with the [ESP-32 storyteller](https://github.com/slvDev/esp32-ai); although this is the first part of a big project.\
-Step 1: Send binary ASCII through wires. (Done)\
-Step 2: Make a LM (Either LLM or SLM) (Done, it wasn't even a LM!)\
-Step 3: Figure out how to get that info to the micro:bit.\
-Step 4: We have a Poem Generator!\
-I specifically made this with a microcontroller with ATMega32p stats and a basic C++ interface, Arduino Uno R3; and a basic SLM handler, micro:bit, which can use SLMs to do basic stuff, and is programmable with JS, Python, Scratch and its lookalikes whether in the Gandi family or not; because I think it would honestly be more impressive if I did it that way, than to use complex microcontroller/Linux PC beasts, like the Raspberry Pi 5/ AI HAT+ /AI HAT+ 2 or an ESP-32 based controller like the Arduino Mini/Nano. But that is for you, dear viewer, to think about and decide.\
-You are allowed to fork it and tweak the code as long as you comply to the Apache 2.0 License in the project. Take inspiration!
-We all can make mistakes so tell me if there's any. We all are people after all.
+### 3. micro:bit Script (`microbit/tick_display.js`)
+Paste this code inside the **JavaScript tab** of the MakeCode editor.
+
+```typescript
+basic.showIcon(IconNames.Square) // Square = Waiting for data stream
+
+basic.forever(function () {
+    // Poll input status on Pin 0
+    if (pins.digitalReadPin(DigitalPin.P0) == 1) {
+        basic.showIcon(IconNames.Yes) // Message complete. Flash the Tick!
+    } else {
+        basic.showIcon(IconNames.Square)
+    }
+    basic.pause(100) 
+})
+```
+
+## 🦾 Requirements & Cross-Platform Hardware Support
+* **micro:bit:** V1 or V2 matching configurations.
+* **I2C LCD Display:** Based on MCP23008/PCF8574 chip lines at address `0x27` (16x2 grid configuration).
+* **Alligator Clips & Jumpers**
+* **Supported Core Devices:** 
+  * Arduino Uno R3, Nano V3, Pro Mini, Elegoo Clone Uno R3 boards, SparkFun RedBoard lines, and Adafruit Metro 328 arrays.
+
+## 📄 Personal Project Notes
+
+This repository was put together for learning, fun, and optimization **by an 11-year-old developer.** No beef with the [ESP-32 storyteller project](https://github.com/slvDev/esp32-ai)—this is just the foundational stage of a much larger vision!
+
+### 🗺️ The Project Road Map
+* **Step 1:** Transfer raw binary ASCII values across physical terminal lines. (**Done**)
+* **Step 2:** Construct an autonomous language model generator template block. (**Done**)
+* **Step 3:** Figure out how to sync cloud code streams straight into a local micro:bit loop. (**Done**)
+* **Step 4:** Build a fully independent desktop Poem Matrix generator system! (**Done**)
+
+I specifically opted to build this using an ATMega328P profile platform paired with basic C++ interfaces, instead of scaling up to massive Linux-based processing engines like a Raspberry Pi 5 or an AI HAT+ expansion shield. Stripping down the architecture makes it significantly more challenging—and much more rewarding when the full string processes flawlessly!
+
