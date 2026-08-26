@@ -1,64 +1,55 @@
 # ASCII-Wires: The Direct-Stream Poem Project
-## Bit-Paced Serial Transfer & Direct GPIO Inter-Device Signaling
+## Bit-Paced Serial Transfer & Non-Blocking LCD Buffer Management
 
-A hands-on embedded-systems project that demonstrates **direct serial data ingest and hardware signaling between microcontrollers** using a Mac (PyCharm), an **Arduino Uno R3**, and a **BBC micro:bit V1/V2**.
+A hands-on embedded-systems project that demonstrates **direct serial data ingest and non-blocking hardware presentation** using a Mac (PyCharm) and an **Arduino Uno R3** driving an I2C LCD screen.
 
 ## 📌 Project Overview
 
-This project explores how a computer script can stream dynamically generated data into an entry-level microcontroller over standard serial protocols, and use hardware-level digital state changes to trigger multi-screen status indicators across platform families.
+This project explores how a computer script can stream dynamically generated data into an entry-level microcontroller over standard serial protocols without relying on massive computing platforms.
 
-The system loops through four distinct stages:
+The system loops through three distinct stages:
 1. **PyCharm (Mac):** Generates a grammatically aligned random poem and streams it character-by-character over a direct USB line.
-2. **Arduino Uno R3 (The Core Receiver):** Collects the text into an isolation software ring buffer to completely bypass the 64-byte hardware limit, typing it out at a readable human pace on an I2C LCD screen.
-3. **The Stop Marker (`#`):** Signals to the Arduino that transmission is complete.
-4. **The micro:bit (Status Node):** Monitors a direct digital input pin from the Arduino. When the pin transitions to `HIGH`, the micro:bit swaps its waiting display to a giant checkmark (**Tick**).
+2. **Arduino Uno R3 (The Core Receiver):** Collects the incoming text into an isolation software ring buffer to completely bypass the default 64-byte hardware limit.
+3. **The Paced Typing Engine:** Sweeps letters out of the buffer using non-blocking clock loops to type out the poem at a readable human pace on a 16x2 LCD screen.
 
 The project is a practical demonstration of:
 * Software-driven hardware buffer overflow management
-* Multi-platform logic levels and shared ground references
-* Continuous background loop sampling inside MakeCode JavaScript (JS)
+* Non-blocking clock timing cycles using `millis()` instead of thread-killing delays
 * Grammatically constrained lexical matrix generators
+* Direct desktop-to-microcontroller interface controls
 
 ## ⚙️ How It Works
 
 ```text
-+-----------------------+              +-----------------------+              +-------------------+
++-----------------------+              +-----------------------+
 
-|     Mac Laptop        |  USB Serial  |   Arduino Uno R3      |  Digital Pin |   BBC micro:bit   |
-|   (PyCharm Python)    | ------------>| (Paced Typing Engine) | ------------>|    (Pin P0 Input) |
-|  [Poem Generator Code]|  (9600 Baud) |  [Prints to I2C LCD]  |  (HIGH Signal)   | [Displays a Tick] |
-+-----------------------+              +-----------------------+              +-------------------+
+|     Mac Laptop        |  USB Serial  |   Arduino Uno R3      |
+|   (PyCharm Python)    | ------------>| (Paced Typing Engine) | ----> [Prints to I2C LCD]
+|  [Poem Generator Code]|  (9600 Baud) |  [256-Byte Ring Buf]  |
++-----------------------+              +-----------------------+
 ```
 
 ### 1. Pacing the Pipeline
-Because the Arduino's hardware interface caps input arrays at **64 bytes**, the Python script paces its output stream by injecting a **25ms delay** between characters. This keeps the incoming buffer cleared while printing.
+Because the Arduino's internal hardware interface caps input streams at **64 bytes**, the Python script paces its output data. It injects a **25ms delay** between characters, ensuring the incoming link stays clear while printing.
 
 ### 2. Typing Engine
-The Arduino continuously sweeps characters out of the serial cache and feeds them into a 256-byte circular array. It applies a non-blocking `millis()` tracking window to step through the array indices every **150ms**, producing a sleek "typing" animation on the LCD without blocking the chip.
+The Arduino sweeps characters out of the serial cache and stores them inside an expanded 256-character software array. It checks a non-blocking `millis()` tracking window to step through the array index every **150ms**, producing a sleek "typing" animation across the LCD lines without freezing the chip.
 
 ## 🔌 Hardware Connection & Pinout
 
 ```text
-[Arduino Uno R3]                            [BBC micro:bit]
-      5V  ------------------------------->    VCC / 3V Pad
-     GND  ------------------------------->    GND Pad
-  Pin D3  ------------------------------->    Pin P0 Pad
-
 [Arduino Uno R3]                            [I2C LCD Display]
-  Pin A4 (SDA) -------------------------->    SDA
-  Pin A5 (SCL) -------------------------->    SCL
+          5V  -------------------------->    VCC
+         GND  -------------------------->    GND
+     Pin A4   -------------------------->    SDA (Serial Data Line)
+     Pin A5   -------------------------->    SCL (Serial Clock Line)
 ```
-
-> ⚠️ **Important Wiring Note:** Connecting a common ground (`GND`) wire between all active platforms is absolutely mandatory to prevent floating logic states and noise disruption. 
 
 ## 📂 Project Structure
 
 ```text
 ├── arduino/
 │   └── lcd_receiver.ino     # Non-blocking ring buffer typing engine
-│
-├── microbit/
-│   └── tick_display.js      # MakeCode JavaScript pin monitoring script
 │
 ├── python/
 │   └── poem_sender.py       # Paced character stream generator
@@ -109,25 +100,29 @@ def generate_perfect_poem(subject="nature"):
 SERIAL_PORT = '/dev/cu.usbmodem14201'  # Mac port assignment
 BAUD_RATE = 9600      
 
-try:
-    poem_output = generate_perfect_poem("ocean")
-    print(f"Generated text:\n{poem_output}\n")
-    
-    ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
-    time.sleep(2) # Give the bootloader time to pass control
-    
-    payload = poem_output.strip() + "#"
-    print("Pacing transmission over USB link to prevent buffer overflow...")
-    
-    for char in payload:
-        ser.write(char.encode('utf-8'))
-        ser.flush()
-        time.sleep(0.025) # 25ms delay
+def main():
+    try:
+        poem_output = generate_perfect_poem("ocean")
+        print(f"Generated text:\n{poem_output}\n")
         
-    ser.close()
-    print("Sent successfully!")
+        ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
+        time.sleep(2) # Give the bootloader time to pass control
+        
+        payload = poem_output.strip() + "#"
+        print("Streaming paced characters over USB link to prevent buffer overflow...")
+        
+        for char in payload:
+            ser.write(char.encode('utf-8'))
+            ser.flush()
+            time.sleep(0.025) # 25ms delay
+            
+        ser.close()
+        print("Sent successfully!")
 except Exception as e:
     print(f"Error: {e}")
+
+if __name__ == "__main__":
+    main()
 ```
 
 ### 2. Arduino Core Engine (`arduino/lcd_receiver.ino`)
@@ -137,7 +132,6 @@ Upload this code to your **Arduino Uno R3**.
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 
-const int triggerPin = 3; 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 char textBuffer[256];
@@ -153,8 +147,6 @@ const unsigned long printInterval = 150;
 
 void setup() {
   Serial.begin(9600); 
-  pinMode(triggerPin, OUTPUT);
-  digitalWrite(triggerPin, LOW);
 
   lcd.init();
   lcd.backlight();
@@ -163,12 +155,14 @@ void setup() {
 }
 
 void loop() {
+  // 1. Gather all incoming data immediately to bypass the 64-byte limit
   while (Serial.available() > 0) {
     char c = Serial.read();
     textBuffer[writeIndex] = c;
     writeIndex = (writeIndex + 1) % 256; 
   }
 
+  // 2. Typing pacing loop running on non-blocking intervals
   if (readIndex != writeIndex) {
     if (millis() - lastPrintTime >= printInterval) {
       lastPrintTime = millis(); 
@@ -181,12 +175,10 @@ void loop() {
         lcdColumn = 0;
         lcdRow = 0;
         isPrintingPoem = true;
-        digitalWrite(triggerPin, LOW); 
       }
 
       if (nextChar == '#') {
-        digitalWrite(triggerPin, HIGH); 
-        isPrintingPoem = false;         
+        isPrintingPoem = false; // Poem finished processing        
       } 
       else if (nextChar >= 32 && nextChar <= 126) {
         lcd.setCursor(lcdColumn, lcdRow);
@@ -209,39 +201,22 @@ void loop() {
 }
 ```
 
-### 3. micro:bit Script (`microbit/tick_display.js`)
-Paste this code inside the **JavaScript tab** of the MakeCode editor.
-
-```typescript
-basic.showIcon(IconNames.Square) // Square = Waiting for data stream
-
-basic.forever(function () {
-    // Poll input status on Pin 0
-    if (pins.digitalReadPin(DigitalPin.P0) == 1) {
-        basic.showIcon(IconNames.Yes) // Message complete. Flash the Tick!
-    } else {
-        basic.showIcon(IconNames.Square)
-    }
-    basic.pause(100) 
-})
-```
-
 ## 🦾 Requirements & Cross-Platform Hardware Support
-* **micro:bit:** V1 or V2 matching configurations.
-* **I2C LCD Display:** Based on MCP23008/PCF8574 chip lines at address `0x27` (16x2 grid configuration).
-* **Alligator Clips & Jumpers**
+* **I2C LCD Display:** Based on MCP23008/PCF8574 chip line expansions at address `0x27` (16x2 grid configuration).
+* **Jumper Cables**
 * **Supported Core Devices:** 
   * Arduino Uno R3, Nano V3, Pro Mini, Elegoo Clone Uno R3 boards, SparkFun RedBoard lines, and Adafruit Metro 328 arrays.
 
 ## 📄 Personal Project Notes
 
-This repository was put together for learning, fun, and optimization **by an 11-year-old developer.** No beef with the [ESP-32 storyteller project](https://github.com/slvDev/esp32-ai)—this is just the foundational stage of a much larger vision!
+This repository was put together for learning, fun, and optimization **by an 11-year-old developer.** No beef with the [ESP-32 storyteller project](https://github.com)—this is just the foundational stage of a much larger vision!
 
 ### 🗺️ The Project Road Map
 * **Step 1:** Transfer raw binary ASCII values across physical terminal lines. (**Done**)
 * **Step 2:** Construct an autonomous language model generator template block. (**Done**)
-* **Step 3:** Figure out how to sync cloud code streams straight into a local micro:bit loop. (**Done**)
+* **Step 3:** Figure out how to sync computer data streams straight into a local screen pipeline. (**Done**)
 * **Step 4:** Build a fully independent desktop Poem Matrix generator system! (**Done**)
 
-I specifically opted to build this using an ATMega328P profile platform paired with basic C++ interfaces, instead of scaling up to massive Linux-based processing engines like a Raspberry Pi 5 or an AI HAT+ expansion shield. Stripping down the architecture makes it significantly more challenging—and much more rewarding when the full string processes flawlessly!
+I specifically opted to build this using an ATMega328P profile platform paired with basic C++ interfaces, instead of scaling up to massive Linux-based processing engines like a Raspberry Pi 5. Stripping down the architecture makes it significantly more challenging—and much more rewarding when the full string processes flawlessly!
 
+You are free to fork this project, modify the text pools, or tweak the non-blocking array sizing configurations under the rules of the **Apache 2.0 License** included in the repository. Enjoy exploring the hardware loops!
