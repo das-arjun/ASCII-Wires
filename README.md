@@ -216,6 +216,7 @@ This repository was put together for learning, fun, and optimization **by an 11-
 * **Step 2:** Construct an autonomous language model generator template block. (**Done**)
 * **Step 3:** Figure out how to sync computer data streams straight into a local screen pipeline. (**Done**)
 * **Step 4:** Build a fully independent desktop Poem Matrix generator system! (**Done**)
+* **Step 5:** Add text to speech and speech to text.
 
 I specifically opted to build this using an ATMega328P profile platform paired with basic C++ interfaces, instead of scaling up to massive Linux-based processing engines like a Raspberry Pi 5. Stripping down the architecture makes it significantly more challenging—and much more rewarding when the full string processes flawlessly!
 
