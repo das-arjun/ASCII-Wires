@@ -6,7 +6,7 @@ import multiprocessing
 
 # ==================== MANUAL TUNING CONFIGURATION ====================
 TALKING_SPEED = 80  # 👈 Adjust this up/down to match your LCD's print speed!
-SERIAL_PORT = '/dev/cu.usbmodem14201'
+SERIAL_PORT = '/dev/cu.usbmodem14201' # <------ Modify this to your USB port.
 BAUD_RATE = 9600
 
 
