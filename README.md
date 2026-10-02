@@ -222,4 +222,6 @@ I specifically opted to build this using an ATMega328P profile platform paired w
 
 You are free to fork this project, modify the text pools, or tweak the non-blocking array sizing configurations under the rules of the **Apache 2.0 License** included in the repository. Enjoy exploring the hardware loops!
 
-TTS is finally here, woohoo! 📢🥳
+### After over a month since August 28th, the TTS service is finally here, woohoo! 📢🥳
+I was procrastinating till about Mid-September, then I was having a hard time finding the right TTS; it seemed like every TTS service had a catch, like an paid API key, or just a week's trial, then pay up! But then, I came across pyttsx3, the mega-cum-free-cum-python library that saved my father's money. I would highly recommend pyttsx3 for beginners. Also I was having trouble syncing everything but i also added multiproccesing and that seemed to work.
+I know the TTS is slow, but I'm too lazy to provide a ratio to correlate Words per second to the Characters per second, so deal with it.
